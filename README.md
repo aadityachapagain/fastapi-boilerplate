@@ -2,6 +2,37 @@
 
 Project to rapidly setup python fastapi project with tests, middleware for auth , payment , life cycle management , ... .
 
+## Architecture
+
+The application follows a layered architecture:
+
+1. **Routes Layer** (`routes.py`): API endpoints definitions and request handling
+2. **Service Layer** (`service.py`): Business logic implementation
+3. **Data Layer** (`models.py`): Database schema and data access
+4. **Event System** (`events.py`): Pub/sub event handling for async operations
+
+### Key Components
+
+- **Authentication**: Bearer token authentication implemented as middleware
+- **Validation**: Generic utilities for input validation
+- **Error Handling**: Consistent error responses
+- **Event System**: Pub/sub pattern for decoupling operations
+- **Logging**: Comprehensive logging for operations and errors
+
+## Structured Segregation of Routers/endpoint
+
+Inside routers, you can see `items` directory which refers to endpoint related to items.
+Similarly, in future if you had to add new set of endpoints for new tasks, you would just create new directory
+where you put your implementation logic and import it directly to main.py as a router. 
+
+```py
+
+app.include_router(items_router, prefix="/api/v1")
+app.include_router(tasks, prefix="/api/v1/")
+
+# so on
+```
+
 ## Requirements
 
 - Python 3.10+
