@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel, Field, field_validator
-from src.utils.validators import validate_postcode, validate_start_date, validate_name_in_users
+from pydantic import BaseModel, Field, field_validator, model_validator
+from src.utils.validators import validate_postcode, validate_start_date
 
 
 class ItemBase(BaseModel):
@@ -50,12 +50,14 @@ class ItemCreate(ItemBase):
             raise ValueError('Start date must be at least 1 week after creation date')
         return v
     
-    @field_validator('name')
-    def name_must_be_in_users(cls, v, values):
+    @model_validator(mode='after')
+    def validate_name_in_users(self):
         """Validate name is in users list."""
-        if 'users' in values and v not in values['users']:
+        name = self.name
+        users = self.users
+        if name not in users:
             raise ValueError('Name must be included in the users list')
-        return v
+        return self
 
 
 class ItemUpdate(ItemBase):
@@ -88,13 +90,14 @@ class ItemUpdate(ItemBase):
             raise ValueError('Start date must be at least 1 week after creation date')
         return v
     
-    @field_validator('name')
-    def name_must_be_in_users(cls, v, values):
+    @model_validator(mode='after')
+    def validate_name_in_users(self):
         """Validate name is in users list if both are present."""
-        if v is not None and 'users' in values and values['users'] is not None:
-            if v not in values['users']:
-                raise ValueError('Name must be included in the users list')
-        return v
+        name = self.name
+        users = self.users
+        if name is not None and users is not None and name not in users:
+            raise ValueError('Name must be included in the users list')
+        return self
 
 
 class ItemResponse(ItemBase):

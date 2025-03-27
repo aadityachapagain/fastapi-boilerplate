@@ -40,8 +40,8 @@ class Item(Document):
     def save(self, *args, **kwargs):
         """Override save method to update timestamps."""
         if not self.id:
-            self.created_at = datetime.datetime.utcnow()
-        self.updated_at = datetime.datetime.utcnow()
+            self.created_at = datetime.datetime.now(datetime.UTC)
+        self.updated_at = datetime.datetime.now(datetime.UTC)
         return super(Item, self).save(*args, **kwargs)
     
     def to_dict(self):

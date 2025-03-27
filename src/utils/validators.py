@@ -47,7 +47,7 @@ def validate_start_date(start_date: datetime.datetime) -> bool:
     Returns:
         bool: True if valid, False otherwise
     """
-    one_week_from_now = datetime.datetime.utcnow() + datetime.timedelta(weeks=1)
+    one_week_from_now = datetime.datetime.now(datetime.UTC) + datetime.timedelta(weeks=1)
     return start_date >= one_week_from_now
 
 

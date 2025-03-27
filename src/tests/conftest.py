@@ -71,7 +71,7 @@ def mock_failed_zipcode_api():
 def valid_item_data():
     """Valid item data for testing."""
     # One week from now for start date
-    start_date = datetime.datetime.utcnow() + datetime.timedelta(weeks=1, days=1)
+    start_date = datetime.datetime.now(datetime.UTC) + datetime.timedelta(weeks=1, days=1)
     
     return {
         "name": "Test Item",
@@ -90,14 +90,14 @@ def invalid_item_data():
         "postcode": "invalid",  # Invalid postcode
         "title": "Test Title",
         "users": ["User One", "User Two"],  # Name not in users
-        "startDate": datetime.datetime.utcnow().isoformat()  # Invalid start date (too soon)
+        "startDate": datetime.datetime.now(datetime.UTC).isoformat()  # Invalid start date (too soon)
     }
 
 
 @pytest.fixture
 def sample_item():
     """Create a sample item in the database."""
-    start_date = datetime.datetime.utcnow() + datetime.timedelta(weeks=1, days=1)
+    start_date = datetime.datetime.now(datetime.UTC) + datetime.timedelta(weeks=1, days=1)
     
     item = Item(
         name="Sample Item",

@@ -5,6 +5,7 @@ from starlette.requests import Request
 
 logger = logging.getLogger(__name__)
 
+# Security scheme for OpenAPI documentation
 auth_scheme = HTTPBearer()
 
 
@@ -23,6 +24,7 @@ class AuthMiddleware:
         Returns:
             dict: Empty dict to satisfy dependency requirements
         """
+        # Extract the Authorization header
         auth_header = request.headers.get("Authorization")
         
         if not auth_header:
@@ -32,6 +34,7 @@ class AuthMiddleware:
                 detail="Missing Authorization header"
             )
         
+        # Check if it's a valid Bearer token format
         parts = auth_header.split()
         
         if len(parts) != 2 or parts[0].lower() != "bearer":
@@ -41,6 +44,7 @@ class AuthMiddleware:
                 detail="Invalid Authorization header format. Use 'Bearer your_token'"
             )
         
+        # Get the token
         token = parts[1]
         
         if not token:
@@ -50,9 +54,10 @@ class AuthMiddleware:
                 detail="Empty token provided"
             )
         
-        # for now only accept non-empty token as valid
-        # this would validate the token against
+        # For this task, we accept any non-empty token as valid
+        # In a real application, this would validate the token against
         # a JWT secret, user database, etc.
         logger.info(f"Request authenticated with token: {token[:5]}...")
         
+        # Return an empty dict to satisfy dependency requirements
         return {}
