@@ -5,13 +5,20 @@ from fastapi.testclient import TestClient
 from unittest.mock import patch, AsyncMock
 import datetime
 
-from src.main import app
-from src.db.models import Item
+# Patch the main app to prevent connection issues during import
+with patch('src.db.connection.connect_to_database'):
+    from src.main import app
+
+from src.db.models.items import Item
 
 
 @pytest.fixture
 def test_client():
     """Create a test client for FastAPI app."""
+    # Disable app startup/shutdown events to prevent MongoDB connection issues
+    app.router.on_startup = []
+    app.router.on_shutdown = []
+    
     with TestClient(app) as client:
         yield client
 
@@ -19,8 +26,10 @@ def test_client():
 @pytest.fixture(autouse=True)
 def mock_mongo():
     """Mock MongoDB connection for tests."""
+    # Disconnect any existing connections
     mongoengine.disconnect_all()
     
+    # Connect to MongoMock
     mongoengine.connect(
         db='mongoenginetest',
         host='mongodb://localhost',
@@ -30,6 +39,7 @@ def mock_mongo():
     
     yield
     
+    # Clean up
     mongoengine.disconnect_all()
 
 
@@ -60,6 +70,7 @@ def mock_failed_zipcode_api():
 @pytest.fixture
 def valid_item_data():
     """Valid item data for testing."""
+    # One week from now for start date
     start_date = datetime.datetime.utcnow() + datetime.timedelta(weeks=1, days=1)
     
     return {
@@ -102,7 +113,11 @@ def sample_item():
     
     yield item
     
-    Item.objects(id=item.id).delete()
+    # Clean up
+    try:
+        Item.objects(id=item.id).delete()
+    except:
+        pass
 
 
 @pytest.fixture

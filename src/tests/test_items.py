@@ -3,12 +3,12 @@ from bson import ObjectId
 import datetime
 from fastapi.testclient import TestClient
 
-from src.db.models import Item
+from src.db.models.items import Item
 
 
 def test_get_items(test_client: TestClient, auth_headers, sample_item):
     """Test getting all items."""
-    response = test_client.get("/items", headers=auth_headers)
+    response = test_client.get("/api/v1/items", headers=auth_headers)
     
     assert response.status_code == 200
     assert isinstance(response.json(), list)
@@ -22,7 +22,7 @@ def test_get_items(test_client: TestClient, auth_headers, sample_item):
 
 def test_get_item_by_id(test_client: TestClient, auth_headers, sample_item):
     """Test getting a specific item by ID."""
-    response = test_client.get(f"/items/{sample_item.id}", headers=auth_headers)
+    response = test_client.get(f"/api/v1/items/{sample_item.id}", headers=auth_headers)
     
     assert response.status_code == 200
     assert response.json()["id"] == str(sample_item.id)
@@ -34,7 +34,7 @@ def test_get_item_by_id(test_client: TestClient, auth_headers, sample_item):
 def test_get_item_by_id_not_found(test_client: TestClient, auth_headers):
     """Test getting a non-existent item."""
     fake_id = str(ObjectId())
-    response = test_client.get(f"/items/{fake_id}", headers=auth_headers)
+    response = test_client.get(f"/api/v1/items/{fake_id}", headers=auth_headers)
     
     assert response.status_code == 404
     assert "Item not found" in response.json()["detail"]
